@@ -1,29 +1,31 @@
 {
   "name": "click",
+  "description": "PI extension providing SQLite-based persistent memory for AI agents with FTS5 search, project/user scoping, and auto-injection of relevant context.",
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "license": "MIT",
+  "keywords": ["pi-package"],
   "scripts": {
-    "clean": "rm -rf node_modules",
-    "build": "tsc --noEmit",
-    "check": "tsc --noEmit"
+    "check": "biome check && tsc --noEmit",
+    "format": "biome check --write",
+    "lint": "biome check"
   },
   "pi": {
-    "extensions": [
-      "./src/index.ts"
-    ]
+    "extensions": ["./src/index.ts"]
   },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*",
-    "@mariozechner/pi-tui": "*",
-    "@mariozechner/pi-ai": "*",
-    "@sinclair/typebox": "*"
+    "@mariozechner/pi-coding-agent": "^0.57.0",
+    "@mariozechner/pi-tui": "^0.57.0",
+    "@mariozechner/pi-ai": "^0.57.0",
+    "@sinclair/typebox": "^0.34.0"
   },
   "devDependencies": {
-    "@mariozechner/pi-coding-agent": "*",
-    "@mariozechner/pi-tui": "*",
-    "@mariozechner/pi-ai": "*",
-    "@sinclair/typebox": "*",
-    "typescript": "^5.8.0"
+    "@biomejs/biome": "^2.4.6",
+    "@mariozechner/pi-coding-agent": "^0.57.0",
+    "@mariozechner/pi-tui": "^0.57.0",
+    "@mariozechner/pi-ai": "^0.57.0",
+    "@sinclair/typebox": "^0.34.0",
+    "typescript": "^5.9.0"
   }
 }

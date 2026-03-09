@@ -1,16 +1,16 @@
-import { Type } from "@sinclair/typebox";
 import { StringEnum } from "@mariozechner/pi-ai";
+import { Type } from "@sinclair/typebox";
 
 export const CATEGORIES = [
-  "fact",
-  "decision",
-  "preference",
-  "snippet",
-  "todo",
-  "lesson",
-  "pattern",
-  "convention",
-  "overview",
+	"fact",
+	"decision",
+	"preference",
+	"snippet",
+	"todo",
+	"lesson",
+	"pattern",
+	"convention",
+	"overview",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
@@ -28,34 +28,34 @@ export const ScopeSchema = StringEnum(SCOPES);
 export const SearchScopeSchema = StringEnum(SEARCH_SCOPES);
 
 export const OptionalScope = Type.Optional(
-  Type.Union([ScopeSchema], {
-    description:
-      'Memory scope: "project" (default) for project-specific knowledge, "user" for cross-project user knowledge',
-    default: "project",
-  })
+	Type.Union([ScopeSchema], {
+		description:
+			'Memory scope: "project" (default) for project-specific knowledge, "user" for cross-project user knowledge',
+		default: "project",
+	}),
 );
 
 export const OptionalSearchScope = Type.Optional(
-  Type.Union([SearchScopeSchema], {
-    description:
-      'Memory scope: "project" (default) for project-specific, "user" for cross-project, "both" to search all',
-    default: "project",
-  })
+	Type.Union([SearchScopeSchema], {
+		description:
+			'Memory scope: "project" (default) for project-specific, "user" for cross-project, "both" to search all',
+		default: "project",
+	}),
 );
 
 export interface Memory {
-  id: number;
-  scope: Scope;
-  project: string | null;
-  category: Category;
-  title: string;
-  content: string;
-  tags: string | null;
-  created_at: string;
-  updated_at: string;
+	id: number;
+	scope: Scope;
+	project: string | null;
+	category: Category;
+	title: string;
+	content: string;
+	tags: string | null;
+	created_at: string;
+	updated_at: string;
 }
 
 export interface MemoryStats {
-  category: string;
-  count: number;
+	category: string;
+	count: number;
 }
