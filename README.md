@@ -16,16 +16,12 @@ A [pi](https://github.com/badlogic/pi-mono) extension that gives your AI agent p
 
 ## Install
 
-```bash
-pi install click
-```
-
-Or add it manually to your project's `.pi/packages.json`:
+Add it to your `.pi/packages.json`:
 
 ```json
 {
   "packages": [
-    { "name": "click", "path": "/path/to/click" }
+    "git:github.com/Huijiro/click"
   ]
 }
 ```
