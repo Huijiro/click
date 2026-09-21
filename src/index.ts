@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { closeAll, getDb, getOverviews, getTotalCount, searchMemories } from "./db.js";
 import { registerForgetTool } from "./tools/forget.js";
 import { registerListTool } from "./tools/list.js";
@@ -40,7 +40,10 @@ export default function (pi: ExtensionAPI) {
 		const db = getDb();
 		const cwd = ctx.cwd;
 		const prompt = event.prompt;
-		if (!prompt || prompt.trim().length === 0) return;
+		if (!prompt || prompt.trim().length === 0) {
+			delete event.systemPromptOptions.sections.click_memories;
+			return;
+		}
 
 		const sections: string[] = [];
 
@@ -85,17 +88,12 @@ export default function (pi: ExtensionAPI) {
 			}
 		}
 
-		if (sections.length === 0) return;
+		if (sections.length === 0) {
+			delete event.systemPromptOptions.sections.click_memories;
+			return;
+		}
 
-		const content = `# Recalled Memories (auto-injected)\n\n${sections.join("\n\n")}`;
-
-		return {
-			message: {
-				customType: "click-memory-context",
-				content,
-				display: false,
-			},
-		};
+		event.systemPromptOptions.sections.click_memories = sections.join("\n\n");
 	});
 
 	// Clean up DB connections on shutdown

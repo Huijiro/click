@@ -1,6 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import type { Category, Memory, MemoryStats, Scope, SearchScope } from "./types.js";
 
 const SCHEMA = `
@@ -42,8 +43,7 @@ const SCHEMA = `
 `;
 
 function getDbPath(): string {
-	const home = process.env.HOME ?? process.env.USERPROFILE ?? "~";
-	return join(home, ".pi", "agent", "click", "memories.db");
+	return join(getAgentDir(), "click", "memories.db");
 }
 
 let cachedDb: DatabaseSync | null = null;

@@ -1,5 +1,5 @@
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { Type } from "@sinclair/typebox";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { Type } from "typebox";
 import { getDb, getTotalCount, listMemories } from "../db.js";
 import { CategorySchema, type Memory, OptionalSearchScope, type SearchScope } from "../types.js";
 

@@ -2,7 +2,7 @@
 
 > *"It's a universal remote that is programmed to your preferences... it learns your patterns."* — Morty, Click (2006)
 
-A [pi](https://github.com/badlogic/pi-mono) extension that gives your AI agent persistent memory across sessions. Memories are stored in a local SQLite database with FTS5 full-text search and automatically injected as context at the start of each conversation — so the agent already knows your project conventions, past decisions, and personal preferences before you say anything.
+A [Pi](https://github.com/earendil-works/pi) extension that gives your AI agent persistent memory across sessions. Memories are stored in a local SQLite database with FTS5 full-text search and automatically injected as context at the start of each conversation — so the agent already knows your project conventions, past decisions, and personal preferences before you say anything.
 
 ## Features
 
@@ -16,15 +16,13 @@ A [pi](https://github.com/badlogic/pi-mono) extension that gives your AI agent p
 
 ## Install
 
-Add it to your `.pi/packages.json`:
+Install it with Pi:
 
-```json
-{
-  "packages": [
-    "git:github.com/Huijiro/click"
-  ]
-}
+```bash
+pi install git:github.com/Huijiro/click
 ```
+
+Use `pi install -l git:github.com/Huijiro/click` to install it for the current project only.
 
 ## Tools
 
@@ -58,9 +56,9 @@ Before each agent turn, Click:
 
 1. Loads all `overview` memories (project + user) — these are high-level summaries meant to always be present.
 2. Searches for memories relevant to the current prompt using FTS5.
-3. Injects both as a context block appended to the conversation, capped at ~4KB to stay token-efficient.
+3. Adds both to Pi's structured system prompt sections, capped at ~4KB. Pi updates the section when recalled memories change instead of appending another message to the conversation.
 
-The agent sees this as a `# Recalled Memories (auto-injected)` section with brief summaries. It doesn't need to call any tools to benefit from existing memories.
+The agent receives this in a `click_memories` system prompt section with brief summaries. It doesn't need to call any tools to benefit from existing memories.
 
 ### Categories
 
