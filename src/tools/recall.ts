@@ -1,7 +1,15 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { getDb, searchMemories } from "../db.js";
-import { CategorySchema, type Memory, OptionalSearchScope, type SearchScope } from "../types.js";
+import {
+	CategorySchema,
+	MEMORY_NAMESPACE,
+	type Memory,
+	MemorySchema,
+	OptionalSearchScope,
+	type SearchScope,
+	SearchScopeSchema,
+} from "../types.js";
 
 function formatMemory(m: Memory): string {
 	let text = `#${m.id} [${m.scope}/${m.category}] ${m.title}`;
@@ -24,6 +32,13 @@ export function registerRecallTool(pi: ExtensionAPI) {
 			"Try broad queries first, then narrow with category or tag filters if there are too many results.",
 			'Use scope "both" to search across project and user memories at once.',
 		],
+		namespace: MEMORY_NAMESPACE,
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			idempotentHint: true,
+			openWorldHint: false,
+		},
 		parameters: Type.Object({
 			query: Type.String({
 				description: "Search query — keywords or phrases to match against memory titles and content",
@@ -32,6 +47,11 @@ export function registerRecallTool(pi: ExtensionAPI) {
 			tags: Type.Optional(Type.String({ description: "Comma-separated tags to filter by" })),
 			scope: OptionalSearchScope,
 			limit: Type.Optional(Type.Number({ description: "Max results to return (default: 20)", default: 20 })),
+		}),
+		outputSchema: Type.Object({
+			results: Type.Array(MemorySchema),
+			scope: SearchScopeSchema,
+			query: Type.String(),
 		}),
 
 		async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
@@ -53,6 +73,7 @@ export function registerRecallTool(pi: ExtensionAPI) {
 						},
 					],
 					details: { results: [], scope, query: params.query },
+					structuredContent: { results: [], scope, query: params.query },
 				};
 			}
 
@@ -65,6 +86,7 @@ export function registerRecallTool(pi: ExtensionAPI) {
 					},
 				],
 				details: { results, scope, query: params.query },
+				structuredContent: { results, scope, query: params.query },
 			};
 		},
 	});

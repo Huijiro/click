@@ -8,7 +8,7 @@ A [Pi](https://github.com/earendil-works/pi) extension that gives your AI agent 
 
 - **Persistent memory** — Survives across sessions. No more re-explaining your project setup.
 - **Full-text search** — FTS5-powered search across titles, content, and tags.
-- **Scoped memories** — `project` scope for codebase-specific knowledge (tied to cwd), `user` scope for cross-project preferences.
+- **Scoped memories** — `project` scope for codebase-specific knowledge (tied to cwd), `user` scope for cross-project preferences, and explicit all-project queries for maintenance.
 - **Auto-injection** — Relevant memories are automatically surfaced before each agent turn based on the user's prompt.
 - **Duplicate detection** — Warns when storing a memory with a similar title to an existing one.
 - **9 categories** — `fact`, `decision`, `preference`, `snippet`, `todo`, `lesson`, `pattern`, `convention`, `overview`.
@@ -26,7 +26,7 @@ Use `pi install -l git:github.com/Huijiro/click` to install it for the current p
 
 ## Tools
 
-Click registers six tools that the agent can use:
+Click registers six tools that the agent can use. Each tool also returns structured data for Pi codemode scripts:
 
 | Tool | Description |
 |------|-------------|
@@ -49,6 +49,8 @@ Each memory has a scope:
 
 - **`project`** — Tied to the working directory. Only surfaces when you're in the same project.
 - **`user`** — Global. Applies everywhere. Use for personal preferences, habits, and cross-project knowledge.
+
+Search and listing tools accept `both` for the current project plus user memories, or `all` for every stored memory. Mutation tools intentionally limit project-scoped changes to the current working directory.
 
 ### Auto-injection
 

@@ -42,6 +42,12 @@ const SCHEMA = `
   END;
 `;
 
+export function initializeDatabase(db: DatabaseSync): void {
+	db.exec("PRAGMA journal_mode = WAL");
+	db.exec("PRAGMA foreign_keys = ON");
+	db.exec(SCHEMA);
+}
+
 function getDbPath(): string {
 	return join(getAgentDir(), "click", "memories.db");
 }
@@ -55,9 +61,7 @@ export function getDb(): DatabaseSync {
 	mkdirSync(dirname(path), { recursive: true });
 
 	const db = new DatabaseSync(path);
-	db.exec("PRAGMA journal_mode = WAL");
-	db.exec("PRAGMA foreign_keys = ON");
-	db.exec(SCHEMA);
+	initializeDatabase(db);
 
 	cachedDb = db;
 	return db;
@@ -78,6 +82,9 @@ export function closeAll(): void {
 
 /** Build the WHERE clause fragment for scope + project filtering */
 function scopeFilter(scope: SearchScope, cwd: string): { where: string; params: (string | null)[] } {
+	if (scope === "all") {
+		return { where: "1 = 1", params: [] };
+	}
 	if (scope === "user") {
 		return { where: "scope = ?", params: ["user"] };
 	}
@@ -87,8 +94,57 @@ function scopeFilter(scope: SearchScope, cwd: string): { where: string; params: 
 			params: ["user", "project", cwd],
 		};
 	}
-	// "project"
 	return { where: "scope = ? AND project = ?", params: ["project", cwd] };
+}
+
+const SEARCH_STOP_WORDS = new Set([
+	"a",
+	"about",
+	"an",
+	"and",
+	"are",
+	"could",
+	"do",
+	"does",
+	"for",
+	"from",
+	"how",
+	"in",
+	"into",
+	"is",
+	"it",
+	"my",
+	"of",
+	"on",
+	"our",
+	"should",
+	"that",
+	"the",
+	"this",
+	"to",
+	"use",
+	"using",
+	"was",
+	"we",
+	"were",
+	"what",
+	"with",
+	"would",
+	"you",
+]);
+
+/** Convert natural-language input into an FTS5 query without exposing FTS syntax. */
+export function buildFtsQuery(query: string): string | undefined {
+	const tokens = query.match(/[\p{L}\p{N}_]+/gu)?.map((token) => token.toLocaleLowerCase());
+	if (!tokens || tokens.length === 0) return undefined;
+
+	const meaningfulTokens = tokens.filter((token) => token.length > 1 && !SEARCH_STOP_WORDS.has(token));
+	const uniqueTokens = [...new Set(meaningfulTokens.length > 0 ? meaningfulTokens : tokens)];
+
+	return uniqueTokens
+		.slice(0, 32)
+		.map((token) => `"${token}"`)
+		.join(" OR ");
 }
 
 // --- Query helpers ---
@@ -118,8 +174,10 @@ export function searchMemories(
 ): Memory[] {
 	const limit = opts.limit ?? 20;
 	const sf = scopeFilter(scope, cwd);
+	const ftsQuery = buildFtsQuery(query);
+	if (!ftsQuery) return [];
 
-	const params: (string | number | null)[] = [query, ...sf.params];
+	const params: (string | number | null)[] = [ftsQuery, ...sf.params];
 
 	let sql = `
     SELECT d.*, bm25(memories_fts) as rank
@@ -157,7 +215,9 @@ export function findSimilarByTitle(
 	limit: number = 3,
 ): Memory[] {
 	const sf = scopeFilter(scope, cwd);
-	const params: (string | number | null)[] = [title, ...sf.params, limit];
+	const ftsQuery = buildFtsQuery(title);
+	if (!ftsQuery) return [];
+	const params: (string | number | null)[] = [ftsQuery, ...sf.params, limit];
 
 	const sql = `
     SELECT d.*, bm25(memories_fts) as rank
@@ -196,6 +256,11 @@ export function listMemories(
 
 export function getMemoryById(db: DatabaseSync, id: number): Memory | undefined {
 	return db.prepare("SELECT * FROM memories WHERE id = ?").get(id) as unknown as Memory | undefined;
+}
+
+export function memoryMatchesScope(memory: Memory, scope: Scope, cwd: string): boolean {
+	if (scope === "user") return memory.scope === "user";
+	return memory.scope === "project" && memory.project === cwd;
 }
 
 export function updateMemory(

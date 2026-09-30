@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
-import { deleteMemory, getDb, getMemoryById } from "../db.js";
-import { ScopeSchema } from "../types.js";
+import { deleteMemory, getDb, getMemoryById, memoryMatchesScope } from "../db.js";
+import { MEMORY_NAMESPACE, MemorySchema, ScopeSchema } from "../types.js";
 
 export function registerForgetTool(pi: ExtensionAPI) {
 	pi.registerTool({
@@ -12,17 +12,25 @@ export function registerForgetTool(pi: ExtensionAPI) {
 		promptGuidelines: [
 			"Use `forget` only when a memory is clearly outdated, wrong, or the user explicitly asks to remove it.",
 		],
+		namespace: MEMORY_NAMESPACE,
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			idempotentHint: false,
+			openWorldHint: false,
+		},
 		parameters: Type.Object({
 			id: Type.Number({ description: "Memory ID to delete" }),
 			scope: ScopeSchema,
 		}),
+		outputSchema: Type.Object({ deleted: MemorySchema }),
 
-		async execute(_toolCallId, params) {
+		async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
 			const db = getDb();
 
 			const memory = getMemoryById(db, params.id);
-			if (!memory) {
-				throw new Error(`Memory #${params.id} not found.`);
+			if (!memory || !memoryMatchesScope(memory, params.scope, ctx.cwd)) {
+				throw new Error(`Memory #${params.id} not found in ${params.scope} scope.`);
 			}
 
 			deleteMemory(db, params.id);
@@ -35,6 +43,7 @@ export function registerForgetTool(pi: ExtensionAPI) {
 					},
 				],
 				details: { deleted: memory },
+				structuredContent: { deleted: memory },
 			};
 		},
 	});

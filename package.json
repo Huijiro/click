@@ -5,14 +5,19 @@
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
-  "keywords": ["pi-package"],
+  "keywords": [
+    "pi-package"
+  ],
   "scripts": {
-    "check": "biome check && tsc --noEmit",
+    "check": "biome check && tsc --noEmit && npm test",
     "format": "biome check --write",
-    "lint": "biome check"
+    "lint": "biome check",
+    "test": "tsx --test src/**/*.test.ts"
   },
   "pi": {
-    "extensions": ["./src/index.ts"]
+    "extensions": [
+      "./src/index.ts"
+    ]
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",
@@ -21,8 +26,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.6",
-    "@earendil-works/pi-ai": "^0.87.0",
-    "@earendil-works/pi-coding-agent": "^0.87.0",
+    "@earendil-works/pi-ai": "^0.99.1",
+    "@earendil-works/pi-coding-agent": "^0.99.1",
+    "tsx": "^4.23.15",
     "typebox": "1.3.27",
     "typescript": "^5.9.0"
   }

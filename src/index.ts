@@ -67,24 +67,19 @@ export default function (pi: ExtensionAPI) {
 
 		// 2. Search for relevant memories based on the user's prompt
 		if (charBudget > 100) {
-			try {
-				const results = searchMemories(db, "both", cwd, prompt, { limit: MAX_RELEVANT });
-				// Filter out overviews (already injected above)
-				const relevant = results.filter((m) => m.category !== "overview");
-				if (relevant.length > 0) {
-					const relevantLines: string[] = [];
-					for (const m of relevant) {
-						const line = formatMemoryBrief(m);
-						if (charBudget - line.length < 0) break;
-						relevantLines.push(line);
-						charBudget -= line.length + 1;
-					}
-					if (relevantLines.length > 0) {
-						sections.push(`## Relevant Memories\n${relevantLines.join("\n")}`);
-					}
+			const results = searchMemories(db, "both", cwd, prompt, { limit: MAX_RELEVANT });
+			const relevant = results.filter((m) => m.category !== "overview");
+			if (relevant.length > 0) {
+				const relevantLines: string[] = [];
+				for (const m of relevant) {
+					const line = formatMemoryBrief(m);
+					if (charBudget - line.length < 0) break;
+					relevantLines.push(line);
+					charBudget -= line.length + 1;
 				}
-			} catch {
-				// FTS can fail on certain query strings, silently skip
+				if (relevantLines.length > 0) {
+					sections.push(`## Relevant Memories\n${relevantLines.join("\n")}`);
+				}
 			}
 		}
 

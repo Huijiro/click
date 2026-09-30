@@ -1,7 +1,15 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { getDb, getTotalCount, listMemories } from "../db.js";
-import { CategorySchema, type Memory, OptionalSearchScope, type SearchScope } from "../types.js";
+import {
+	CategorySchema,
+	MEMORY_NAMESPACE,
+	type Memory,
+	MemorySchema,
+	OptionalSearchScope,
+	type SearchScope,
+	SearchScopeSchema,
+} from "../types.js";
 
 function formatMemory(m: Memory): string {
 	let text = `#${m.id} [${m.scope}/${m.category}] ${m.title}`;
@@ -18,11 +26,23 @@ export function registerListTool(pi: ExtensionAPI) {
 		description:
 			"List stored memories with optional category filter and pagination. Shows a summary view of each memory.",
 		promptSnippet: "List stored memories with optional category filter and pagination",
+		namespace: MEMORY_NAMESPACE,
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			idempotentHint: true,
+			openWorldHint: false,
+		},
 		parameters: Type.Object({
 			category: Type.Optional(CategorySchema),
 			scope: OptionalSearchScope,
 			limit: Type.Optional(Type.Number({ description: "Max results (default: 50)", default: 50 })),
 			offset: Type.Optional(Type.Number({ description: "Offset for pagination (default: 0)", default: 0 })),
+		}),
+		outputSchema: Type.Object({
+			memories: Type.Array(MemorySchema),
+			scope: SearchScopeSchema,
+			total: Type.Number(),
 		}),
 
 		async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
@@ -46,6 +66,7 @@ export function registerListTool(pi: ExtensionAPI) {
 						},
 					],
 					details: { memories: [], scope, total },
+					structuredContent: { memories: [], scope, total },
 				};
 			}
 
@@ -55,6 +76,7 @@ export function registerListTool(pi: ExtensionAPI) {
 			return {
 				content: [{ type: "text", text: `${header}\n\n${formatted}` }],
 				details: { memories, scope, total },
+				structuredContent: { memories, scope, total },
 			};
 		},
 	});

@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { findSimilarByTitle, getDb, insertMemory } from "../db.js";
-import { CategorySchema, OptionalScope, type Scope } from "../types.js";
+import { CategorySchema, MEMORY_NAMESPACE, MemorySchema, OptionalScope, type Scope, ScopeSchema } from "../types.js";
 
 export function registerRememberTool(pi: ExtensionAPI) {
 	pi.registerTool({
@@ -20,6 +20,13 @@ export function registerRememberTool(pi: ExtensionAPI) {
 			'Use scope "user" for things about the person (preferences, habits, style) that apply across projects. Use scope "project" for things specific to this codebase.',
 			"If the tool warns about potential duplicates, prefer using `update_memory` on the existing one instead of creating a new entry.",
 		],
+		namespace: MEMORY_NAMESPACE,
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			idempotentHint: false,
+			openWorldHint: false,
+		},
 		parameters: Type.Object({
 			category: CategorySchema,
 			title: Type.String({ description: "Short descriptive title for the memory" }),
@@ -33,21 +40,21 @@ export function registerRememberTool(pi: ExtensionAPI) {
 			),
 			scope: OptionalScope,
 		}),
+		outputSchema: Type.Object({
+			memory: MemorySchema,
+			scope: ScopeSchema,
+			hasDuplicateWarning: Type.Boolean(),
+		}),
 
 		async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
 			const scope: Scope = params.scope ?? "project";
 			const db = getDb();
 
-			// Check for potential duplicates
 			let dupWarning = "";
-			try {
-				const similar = findSimilarByTitle(db, scope, ctx.cwd, params.title);
-				if (similar.length > 0) {
-					const dupList = similar.map((m) => `  #${m.id} [${m.scope}/${m.category}] "${m.title}"`).join("\n");
-					dupWarning = `\n\n⚠ Potential duplicates found — consider using update_memory instead:\n${dupList}`;
-				}
-			} catch {
-				// FTS match can fail on certain inputs, proceed with insert
+			const similar = findSimilarByTitle(db, scope, ctx.cwd, params.title);
+			if (similar.length > 0) {
+				const dupList = similar.map((m) => `  #${m.id} [${m.scope}/${m.category}] "${m.title}"`).join("\n");
+				dupWarning = `\n\n⚠ Potential duplicates found — consider using update_memory instead:\n${dupList}`;
 			}
 
 			const memory = insertMemory(db, scope, ctx.cwd, params.category, params.title, params.content, params.tags);
@@ -60,6 +67,7 @@ export function registerRememberTool(pi: ExtensionAPI) {
 					},
 				],
 				details: { memory, scope, hasDuplicateWarning: dupWarning.length > 0 },
+				structuredContent: { memory, scope, hasDuplicateWarning: dupWarning.length > 0 },
 			};
 		},
 	});

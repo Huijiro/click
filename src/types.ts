@@ -20,7 +20,7 @@ export const SCOPES = ["project", "user"] as const;
 export type Scope = (typeof SCOPES)[number];
 
 /** Extended scopes including "both" for search operations */
-export const SEARCH_SCOPES = ["project", "user", "both"] as const;
+export const SEARCH_SCOPES = ["project", "user", "both", "all"] as const;
 export type SearchScope = (typeof SEARCH_SCOPES)[number];
 
 export const CategorySchema = StringEnum(CATEGORIES);
@@ -38,12 +38,25 @@ export const OptionalScope = Type.Optional(
 export const OptionalSearchScope = Type.Optional(
 	Type.Union([SearchScopeSchema], {
 		description:
-			'Memory scope: "project" (default) for project-specific, "user" for cross-project, "both" to search all',
+			'Memory scope: "project" (default) for the current project, "user" for global user memories, "both" for both of those, or "all" for every project and user memory',
 		default: "project",
 	}),
 );
 
+export const MemorySchema = Type.Object({
+	id: Type.Number(),
+	scope: ScopeSchema,
+	project: Type.Union([Type.String(), Type.Null()]),
+	category: CategorySchema,
+	title: Type.String(),
+	content: Type.String(),
+	tags: Type.Union([Type.String(), Type.Null()]),
+	created_at: Type.String(),
+	updated_at: Type.String(),
+});
+
 export interface Memory {
+	[key: string]: string | number | null;
 	id: number;
 	scope: Scope;
 	project: string | null;
@@ -55,7 +68,13 @@ export interface Memory {
 	updated_at: string;
 }
 
+export const MEMORY_NAMESPACE = {
+	name: "click",
+	description: "Persistent project and user memory",
+} as const;
+
 export interface MemoryStats {
+	[key: string]: string | number;
 	category: string;
 	count: number;
 }
