@@ -80,7 +80,8 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+# Click Cursor plugin ships committed bundles under dist/
+# dist
 .output
 
 # Gatsby files

@@ -34,20 +34,14 @@ This repo is also a Cursor plugin (`.cursor-plugin/plugin.json` + `marketplace.j
 
 Cursor treats a local folder as a **marketplace**, not an installed plugin. Indexing alone is not enough — you still have to **Install** Click from that marketplace.
 
-**Local checkout (recommended while developing):**
+**Install from this checkout:**
 
-1. `npm install` in this repo (needed for `click-mcp` / `tsx`).
+1. `npm install && npm run build` (builds `dist/` MCP + inject bundles; committed so marketplace installs work without `node_modules`).
 2. In Cursor: **Customize → Plugins → Add local marketplace / folder** → pick this repo.
 3. In that marketplace, **Install** the `click` plugin (not just add the folder).
-4. Reload Cursor if the MCP tools do not appear.
+4. Reload Cursor / restart the Click MCP if tools do not appear.
 
-Dev shortcut: symlink the checkout into Cursor's local plugin dir so it auto-loads:
-
-```bash
-ln -sfn "$PWD" ~/.cursor/plugins/local/click
-```
-
-Then reload Cursor. Tools should show as `plugin-click-click`.
+Note: Cursor rejects symlinks under `~/.cursor/plugins/local` that point outside that directory, so marketplace **Install** is the supported path. Tools show as `plugin-click-click`.
 
 Pi auto-injects overviews **and** prompt-relevant FTS hits each turn. Cursor injects **overviews at session start** only; call `recall` for prompt-relevant search (no Cursor inject hook for that yet).
 
