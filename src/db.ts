@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import type { Category, Memory, MemoryStats, Scope, SearchScope } from "./types.js";
 
 const SCHEMA = `
@@ -48,22 +48,30 @@ export function initializeDatabase(db: DatabaseSync): void {
 	db.exec(SCHEMA);
 }
 
-function getDbPath(): string {
-	return join(getAgentDir(), "click", "memories.db");
+/** Resolve the Click SQLite path without depending on the Pi runtime. */
+export function resolveDbPath(override?: string): string {
+	if (override) return override;
+	if (process.env.CLICK_DB_PATH) return process.env.CLICK_DB_PATH;
+
+	const agentDir = process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent");
+	return join(agentDir, "click", "memories.db");
 }
 
 let cachedDb: DatabaseSync | null = null;
+let cachedDbPath: string | null = null;
 
-export function getDb(): DatabaseSync {
-	if (cachedDb) return cachedDb;
+export function getDb(pathOverride?: string): DatabaseSync {
+	const path = resolveDbPath(pathOverride);
+	if (cachedDb && cachedDbPath === path) return cachedDb;
+	if (cachedDb) closeAll();
 
-	const path = getDbPath();
 	mkdirSync(dirname(path), { recursive: true });
 
 	const db = new DatabaseSync(path);
 	initializeDatabase(db);
 
 	cachedDb = db;
+	cachedDbPath = path;
 	return db;
 }
 
@@ -75,6 +83,7 @@ export function closeAll(): void {
 			// already closed
 		}
 		cachedDb = null;
+		cachedDbPath = null;
 	}
 }
 

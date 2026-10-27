@@ -1,7 +1,8 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { deleteMemory, getDb, getMemoryById, memoryMatchesScope } from "../db.js";
-import { MEMORY_NAMESPACE, MemorySchema, ScopeSchema } from "../types.js";
+import { MemorySchema, ScopeSchema } from "../schemas.js";
+import { MEMORY_NAMESPACE } from "../types.js";
 
 export function registerForgetTool(pi: ExtensionAPI) {
 	pi.registerTool({

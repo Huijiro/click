@@ -1,0 +1,13 @@
+{
+  "name": "click",
+  "displayName": "Click",
+  "version": "0.1.0",
+  "description": "Local SQLite memory for Cursor agents — same store as the Pi Click extension, with MCP tools and session overview injection.",
+  "author": {
+    "name": "Huijiro"
+  },
+  "homepage": "https://github.com/Huijiro/click",
+  "repository": "https://github.com/Huijiro/click",
+  "license": "MIT",
+  "keywords": ["memory", "mcp", "sqlite", "persistent-context"]
+}

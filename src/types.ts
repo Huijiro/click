@@ -1,6 +1,3 @@
-import { StringEnum } from "@earendil-works/pi-ai";
-import { Type } from "typebox";
-
 export const CATEGORIES = [
 	"fact",
 	"decision",
@@ -22,38 +19,6 @@ export type Scope = (typeof SCOPES)[number];
 /** Extended scopes including "both" for search operations */
 export const SEARCH_SCOPES = ["project", "user", "both", "all"] as const;
 export type SearchScope = (typeof SEARCH_SCOPES)[number];
-
-export const CategorySchema = StringEnum(CATEGORIES);
-export const ScopeSchema = StringEnum(SCOPES);
-export const SearchScopeSchema = StringEnum(SEARCH_SCOPES);
-
-export const OptionalScope = Type.Optional(
-	Type.Union([ScopeSchema], {
-		description:
-			'Memory scope: "project" (default) for project-specific knowledge, "user" for cross-project user knowledge',
-		default: "project",
-	}),
-);
-
-export const OptionalSearchScope = Type.Optional(
-	Type.Union([SearchScopeSchema], {
-		description:
-			'Memory scope: "project" (default) for the current project, "user" for global user memories, "both" for both of those, or "all" for every project and user memory',
-		default: "project",
-	}),
-);
-
-export const MemorySchema = Type.Object({
-	id: Type.Number(),
-	scope: ScopeSchema,
-	project: Type.Union([Type.String(), Type.Null()]),
-	category: CategorySchema,
-	title: Type.String(),
-	content: Type.String(),
-	tags: Type.Union([Type.String(), Type.Null()]),
-	created_at: Type.String(),
-	updated_at: Type.String(),
-});
 
 export interface Memory {
 	[key: string]: string | number | null;
@@ -77,4 +42,16 @@ export interface MemoryStats {
 	[key: string]: string | number;
 	category: string;
 	count: number;
+}
+
+export function isCategory(value: string): value is Category {
+	return (CATEGORIES as readonly string[]).includes(value);
+}
+
+export function isScope(value: string): value is Scope {
+	return (SCOPES as readonly string[]).includes(value);
+}
+
+export function isSearchScope(value: string): value is SearchScope {
+	return (SEARCH_SCOPES as readonly string[]).includes(value);
 }

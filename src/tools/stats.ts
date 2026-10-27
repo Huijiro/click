@@ -1,7 +1,8 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { getDb, getStats, getTotalCount } from "../db.js";
-import { MEMORY_NAMESPACE, OptionalSearchScope, type SearchScope, SearchScopeSchema } from "../types.js";
+import { OptionalSearchScope, SearchScopeSchema } from "../schemas.js";
+import { MEMORY_NAMESPACE, type SearchScope } from "../types.js";
 
 export function registerStatsTool(pi: ExtensionAPI) {
 	pi.registerTool({

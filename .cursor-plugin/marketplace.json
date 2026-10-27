@@ -1,0 +1,17 @@
+{
+  "name": "click",
+  "owner": {
+    "name": "Huijiro"
+  },
+  "metadata": {
+    "description": "Local SQLite memory shared by Pi and Cursor",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "click",
+      "source": ".",
+      "description": "Persistent local memory (MCP tools + session overview injection)"
+    }
+  ]
+}

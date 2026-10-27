@@ -21,6 +21,6 @@
 		}
 	},
 	"files": {
-		"includes": ["src/**/*.ts"]
+		"includes": ["src/**/*.ts", "scripts/**/*.ts"]
 	}
 }

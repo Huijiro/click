@@ -1,15 +1,8 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { getDb, getTotalCount, listMemories } from "../db.js";
-import {
-	CategorySchema,
-	MEMORY_NAMESPACE,
-	type Memory,
-	MemorySchema,
-	OptionalSearchScope,
-	type SearchScope,
-	SearchScopeSchema,
-} from "../types.js";
+import { CategorySchema, MemorySchema, OptionalSearchScope, SearchScopeSchema } from "../schemas.js";
+import { MEMORY_NAMESPACE, type Memory, type SearchScope } from "../types.js";
 
 function formatMemory(m: Memory): string {
 	let text = `#${m.id} [${m.scope}/${m.category}] ${m.title}`;

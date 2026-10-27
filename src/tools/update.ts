@@ -1,7 +1,8 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { getDb, getMemoryById, memoryMatchesScope, updateMemory } from "../db.js";
-import { CategorySchema, MEMORY_NAMESPACE, MemorySchema, ScopeSchema } from "../types.js";
+import { CategorySchema, MemorySchema, ScopeSchema } from "../schemas.js";
+import { MEMORY_NAMESPACE } from "../types.js";
 
 export function registerUpdateTool(pi: ExtensionAPI) {
 	pi.registerTool({

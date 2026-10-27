@@ -1,0 +1,11 @@
+---
+description: Persist durable context with Click memory tools; recall when past decisions or preferences may matter.
+alwaysApply: true
+---
+
+# Click memory
+
+- Use Click MCP tools (`remember`, `recall`, `update_memory`, `forget`) for durable project/user knowledge.
+- Save preferences, decisions, conventions, and lessons with `remember` (scope `user` for personal, `project` for this repo).
+- Prefer `update_memory` when a duplicate warning appears.
+- Overview memories are injected at session start. Call `recall` when you need prompt-relevant search — Cursor does not auto-FTS each turn like Pi.

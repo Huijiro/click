@@ -1,7 +1,8 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { findSimilarByTitle, getDb, insertMemory } from "../db.js";
-import { CategorySchema, MEMORY_NAMESPACE, MemorySchema, OptionalScope, type Scope, ScopeSchema } from "../types.js";
+import { CategorySchema, MemorySchema, OptionalScope, ScopeSchema } from "../schemas.js";
+import { MEMORY_NAMESPACE, type Scope } from "../types.js";
 
 export function registerRememberTool(pi: ExtensionAPI) {
 	pi.registerTool({
