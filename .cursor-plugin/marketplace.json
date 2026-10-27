@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "click",
-      "source": ".",
+      "source": "./",
       "description": "Persistent local memory (MCP tools + session overview injection)"
     }
   ]

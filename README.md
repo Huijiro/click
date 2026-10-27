@@ -26,13 +26,28 @@ Use `pi install -l git:github.com/Huijiro/click` to install it for the current p
 
 ### Cursor plugin
 
-This repo is also a Cursor plugin (`.cursor-plugin/plugin.json`). It bundles:
+This repo is also a Cursor plugin (`.cursor-plugin/plugin.json` + `marketplace.json`). It bundles:
 
 - **MCP server** — the same six memory tools
 - **`sessionStart` hook** — injects overview memories as `additional_context`
 - **Skill + rule** — when/how to remember and recall
 
-Install from a local checkout (Customize → Plugins / add local plugin) or point a team marketplace at this repo. After install, Cursor starts `click-mcp` from `${CURSOR_PLUGIN_ROOT}` and runs `scripts/inject-overviews.mjs` on new chats.
+Cursor treats a local folder as a **marketplace**, not an installed plugin. Indexing alone is not enough — you still have to **Install** Click from that marketplace.
+
+**Local checkout (recommended while developing):**
+
+1. `npm install` in this repo (needed for `click-mcp` / `tsx`).
+2. In Cursor: **Customize → Plugins → Add local marketplace / folder** → pick this repo.
+3. In that marketplace, **Install** the `click` plugin (not just add the folder).
+4. Reload Cursor if the MCP tools do not appear.
+
+Dev shortcut: symlink the checkout into Cursor's local plugin dir so it auto-loads:
+
+```bash
+ln -sfn "$PWD" ~/.cursor/plugins/local/click
+```
+
+Then reload Cursor. Tools should show as `plugin-click-click`.
 
 Pi auto-injects overviews **and** prompt-relevant FTS hits each turn. Cursor injects **overviews at session start** only; call `recall` for prompt-relevant search (no Cursor inject hook for that yet).
 
